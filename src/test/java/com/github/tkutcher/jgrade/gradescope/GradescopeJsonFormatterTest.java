@@ -5,17 +5,17 @@ import com.github.tkutcher.jgrade.gradedtest.GradedTestResult;
 import com.github.tkutcher.jgrade.gradedtest.Visibility;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GradescopeJsonFormatterTest {
 
     private GradescopeJsonFormatter unit;
     private Grader grader;
 
-    @Before
+    @BeforeEach
     public void initUnit() {
         unit = new GradescopeJsonFormatter();
         grader = new Grader();
@@ -25,15 +25,19 @@ public class GradescopeJsonFormatterTest {
         JSONObject o = new JSONObject(s);
     }
 
-    @Test(expected=GradescopeJsonException.class)
+    @Test
     public void invalidIfEmpty() {
-        unit.format(grader);
+        assertThrows(GradescopeJsonException.class, () ->
+                unit.format(grader)
+        );
     }
 
-    @Test(expected=GradescopeJsonException.class)
+    @Test
     public void invalidIfNoTestsOrScore() {
-        grader.setExecutionTime(45);
-        unit.format(grader);
+        assertThrows(GradescopeJsonException.class, () -> {
+            grader.setExecutionTime(45);
+            unit.format(grader);
+        });
     }
 
     @Test

@@ -2,10 +2,19 @@ package com.github.tkutcher.jgrade;
 
 import com.github.tkutcher.jgrade.gradedtest.GradedTestListener;
 import com.github.tkutcher.jgrade.gradedtest.GradedTestResult;
-import org.junit.runner.JUnitCore;
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.LauncherSession;
+import org.junit.platform.launcher.TestPlan;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 
 /**
@@ -15,8 +24,8 @@ import java.util.List;
  * time. Is Observable to {@link OutputFormatter}s.
  *
  * <p>
- *     Has undocumented accessors for score, max score, execution time,
- *     graded test results, and output.
+ * Has undocumented accessors for score, max score, execution time,
+ * graded test results, and output.
  * </p>
  */
 public class Grader {
@@ -36,7 +45,9 @@ public class Grader {
     private Double maxScore;
     private StringBuilder output;
 
-    /** Create a new Grader. */
+    /**
+     * Create a new Grader.
+     */
     public Grader() {
         this.gradedTestResults = new ArrayList<>();
         this.executionTime = NOT_SET;
@@ -48,6 +59,7 @@ public class Grader {
 
     /**
      * Has a score set.
+     *
      * @return True if a score was set.
      */
     public boolean hasScore() {
@@ -56,6 +68,7 @@ public class Grader {
 
     /**
      * Has a max score set.
+     *
      * @return True if max score was set.
      */
     public boolean hasMaxScore() {
@@ -64,6 +77,7 @@ public class Grader {
 
     /**
      * Has an execution time.
+     *
      * @return True if the Graders has an execution time.
      */
     public boolean hasExecutionTime() {
@@ -72,6 +86,7 @@ public class Grader {
 
     /**
      * Has any {@link GradedTestResult}s.
+     *
      * @return True if the list contains at least one result.
      */
     public boolean hasGradedTestResults() {
@@ -80,6 +95,7 @@ public class Grader {
 
     /**
      * Has output for the Grader.
+     *
      * @return True if there is any output to include.
      */
     public boolean hasOutput() {
@@ -88,6 +104,7 @@ public class Grader {
 
     /**
      * Set the score (student's score) for the Grader.
+     *
      * @param score The score to set.
      */
     public void setScore(double score) {
@@ -96,6 +113,7 @@ public class Grader {
 
     /**
      * Set the max potential score for the Grader.
+     *
      * @param maxScore The max potential score to set.
      */
     public void setMaxScore(double maxScore) {
@@ -104,6 +122,7 @@ public class Grader {
 
     /**
      * Set the execution time for the Grader.
+     *
      * @param executionTime The execution time.
      */
     public void setExecutionTime(long executionTime) {
@@ -112,6 +131,7 @@ public class Grader {
 
     /**
      * Add a {@link GradedTestResult} to the Grader.
+     *
      * @param result The {@link GradedTestResult} to add.
      */
     public void addGradedTestResult(GradedTestResult result) {
@@ -120,6 +140,7 @@ public class Grader {
 
     /**
      * Add output to the Grader overall.
+     *
      * @param output The string to append to the output.
      */
     public void addOutput(String output) {
@@ -128,6 +149,7 @@ public class Grader {
 
     /**
      * Get the (student) score for the Grader.
+     *
      * @return The student score.
      */
     public double getScore() {
@@ -136,6 +158,7 @@ public class Grader {
 
     /**
      * Get the max potential score.
+     *
      * @return The max potential score.
      */
     public double getMaxScore() {
@@ -144,6 +167,7 @@ public class Grader {
 
     /**
      * Get the execution time.
+     *
      * @return The execution time.
      */
     public long getExecutionTime() {
@@ -152,14 +176,16 @@ public class Grader {
 
     /**
      * Get the list of {@link GradedTestResult}s.
+     *
      * @return The list of {@link GradedTestResult}s.
-    */
+     */
     public List<GradedTestResult> getGradedTestResults() {
         return gradedTestResults;
     }
 
     /**
      * Get the output for the Grader.
+     *
      * @return All of the output that has been added to the Grader.
      */
     public String getOutput() {
@@ -172,19 +198,23 @@ public class Grader {
      * Set the strategy to use to grade. By default, the strategy is to
      * add {@link GradedTestResult}s as they are. To change that, you can
      * alter them via the strategy and it's grade method.
+     *
      * @param s The strategy to set.
      */
     public void setGraderStrategy(GraderStrategy s) {
         this.graderStrategy = s;
     }
 
-    /** Starts (or resumes) the timer for the Grader. */
+    /**
+     * Starts (or resumes) the timer for the Grader.
+     */
     public void startTimer() {
         this.startTime = System.currentTimeMillis();
     }
 
     /**
      * Stops the timer for the Grader. Can start again after stopping.
+     *
      * @throws IllegalStateException If the timer has not been started.
      */
     public void stopTimer() throws IllegalStateException {
@@ -197,19 +227,24 @@ public class Grader {
 
     /**
      * Runs JUnit tests and attaches a {@link GradedTestListener} to listen
-     * for all {@link com.github.tkutcher.jgrade.gradedtest.GradedTest}s and add the
-     * created {@link GradedTestResult}s. If class <code>MyTests</code> has
+     * for all {@link com.github.tkutcher.jgrade.gradedtest.GradedTest}s and add
+     * the created {@link GradedTestResult}s. If class <code>MyTests</code> has
      * graded test JUnit test methods, then call this method with
-     * <code>MyTests.class</code>. Similarly can use JUnit's
-     * {@link org.junit.runners.Suite}. Can alter the list of results added from the
+     * <code>MyTests.class</code>. Can alter the list of results added from the
      * run by setting the {@link GraderStrategy}.
+     *
      * @param testSuite The class containing the tests.
      */
     public void runJUnitGradedTests(Class testSuite) {
-        GradedTestListener listener = new GradedTestListener();
-        JUnitCore runner = new JUnitCore();
-        runner.addListener(listener);
-        runner.run(testSuite);
+        LauncherDiscoveryRequest request =
+                LauncherDiscoveryRequestBuilder.request()
+                        .selectors(selectClass(testSuite)).build();
+        GradedTestListener listener = new GradedTestListener(testSuite);
+        try (LauncherSession session = LauncherFactory.openSession()) {
+            Launcher launcher = session.getLauncher();
+            launcher.registerTestExecutionListeners(listener);
+            launcher.execute(request);
+        }
         List<GradedTestResult> results = listener.getGradedTestResults();
         this.graderStrategy.grade(results);
         this.gradedTestResults.addAll(results);

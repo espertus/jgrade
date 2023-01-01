@@ -1,17 +1,20 @@
 package com.github.tkutcher.jgrade.gradedtest;
 
-import org.junit.runner.Description;
-import org.junit.runner.notification.Failure;
-import org.junit.runner.notification.RunListener;
+import org.junit.platform.engine.TestExecutionResult;
+import org.junit.platform.engine.TestSource;
+import org.junit.platform.engine.support.descriptor.MethodSource;
+import org.junit.platform.launcher.TestIdentifier;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Set;
 
 /**
- * A class that extends a JUnit {@link RunListener} to check for unit test
+ * FIXME A class that extends a JUnit RunListener to check for unit test
  * methods annotated with the {@link GradedTest} annotation. It builds up a
  * list of {@link GradedTestResult}s, one for each method with the annotation.
  * Captures anything printed to standard out during the test run and adds it
@@ -22,30 +25,33 @@ import java.util.List;
  *     also most recently started (for annotated methods).
  * </p>
  */
-public class GradedTestListener extends RunListener {
+public class GradedTestListener extends SummaryGeneratingListener {
 
     private List<GradedTestResult> gradedTestResults;
     private int numFailedGradedTests;
     private ByteArrayOutputStream testOutput;
     private PrintStream originalOutStream;
     private GradedTestResult currentGradedTestResult;
+    private Class testSuite;
 
     /**
      * Constructor for a new listener. Initializes a list of
      * {@link GradedTestResult}s and remembers the original
      * <code>System.out</code> to restore it.
      */
-    public GradedTestListener() {
+    public GradedTestListener(Class testSuite) {
         this.gradedTestResults = new ArrayList<>();
         this.numFailedGradedTests = 0;
         this.testOutput = new ByteArrayOutputStream();
         this.originalOutStream = System.out;
+        this.testSuite = testSuite;
     }
 
     // <editor-fold "desc="accessors">
 
     /**
      * Get the count of graded tests for this listener.
+     *
      * @return The number of graded tests.
      */
     public int getNumGradedTests() {
@@ -54,6 +60,7 @@ public class GradedTestListener extends RunListener {
 
     /**
      * Get the list of {@link GradedTestResult}.
+     *
      * @return The list of {@link GradedTestResult}.
      */
     public List<GradedTestResult> getGradedTestResults() {
@@ -62,6 +69,7 @@ public class GradedTestListener extends RunListener {
 
     /**
      * Get the number of failed graded tests.
+     *
      * @return The number of graded tests that failed.
      */
     public int getNumFailedGradedTests() {
@@ -80,7 +88,7 @@ public class GradedTestListener extends RunListener {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Calls super method and then looks for a {@link GradedTest} annotation.
      * If one exists, it creates a {@link GradedTestResult} and sets its score
      * to the number of points. If the test fails the score would be set to 0.
@@ -88,21 +96,25 @@ public class GradedTestListener extends RunListener {
      * <code>PrintStream</code> to capture output.
      */
     @Override
-    public void testStarted(Description description) throws Exception {
-        super.testStarted(description);
-
+    public void executionStarted(TestIdentifier identifier) {
+        super.executionStarted(identifier);
         this.currentGradedTestResult = null;
 
-        GradedTest gradedTestAnnotation = description.getAnnotation(GradedTest.class);
-        if (gradedTestAnnotation != null) {
-            this.currentGradedTestResult =  new GradedTestResult(
-                    gradedTestAnnotation.name(),
-                    gradedTestAnnotation.number(),
-                    gradedTestAnnotation.points(),
-                    gradedTestAnnotation.visibility()
-            );
+        if (identifier.isTest()) {
+            TestSource source = identifier.getSource().orElse(null);
+            if (source != null && source instanceof MethodSource) {
+                GradedTest gradedTestAnnotation = ((MethodSource) source).getJavaMethod().getAnnotation(GradedTest.class);
+                if (gradedTestAnnotation != null) {
+                    this.currentGradedTestResult = new GradedTestResult(
+                            gradedTestAnnotation.name(),
+                            gradedTestAnnotation.number(),
+                            gradedTestAnnotation.points(),
+                            gradedTestAnnotation.visibility()
+                    );
 
-            this.currentGradedTestResult.setScore(gradedTestAnnotation.points());
+                    this.currentGradedTestResult.setScore(gradedTestAnnotation.points());
+                }
+            }
         }
 
         this.testOutput = new ByteArrayOutputStream();
@@ -111,47 +123,40 @@ public class GradedTestListener extends RunListener {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Calls super method, adds the {@link GradedTestResult} if it exists, and
      * restores the original <code>PrintStream</code>.
      */
     @Override
-    public void testFinished(Description description) throws Exception {
-        super.testFinished(description);
+    public void executionFinished(TestIdentifier identifier, TestExecutionResult result) {
+        super.executionFinished(identifier, result);
 
+        if (result.getStatus() != TestExecutionResult.Status.SUCCESSFUL) {
+            handleFailure(result);
+        }
         if (this.currentGradedTestResult != null) {
             this.currentGradedTestResult.addOutput(testOutput.toString());
             this.gradedTestResults.add(this.currentGradedTestResult);
         }
-
         this.currentGradedTestResult = null;
         System.setOut(originalOutStream);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Calls super method and if the test was annotated with
-     * {@link GradedTest} then sets the {@link GradedTestResult} score to 0
-     * and adds the failure message to the output.
-     */
-    @Override
-    public void testFailure(Failure failure) throws Exception {
-        super.testFailure(failure);
+    private void handleFailure(TestExecutionResult result) {
         if (this.currentGradedTestResult != null) {
             this.currentGradedTestResult.setScore(0);
             this.currentGradedTestResult.addOutput("FAILED:\n");
-            if (failure.getMessage() != null) {
-                this.currentGradedTestResult.addOutput(failure.getMessage());
+            Throwable throwable = result.getThrowable().orElse(null);
+            if (throwable != null && throwable.getMessage() != null) {
+                this.currentGradedTestResult.addOutput(throwable.getMessage());
             } else {
                 // This way no testing information is leaked - if you want to give students
                 // feedback on why they failed use a message.
                 this.currentGradedTestResult.addOutput("No description provided");
             }
             this.currentGradedTestResult.addOutput("\n");
-            numFailedGradedTests++;
+            this.numFailedGradedTests++;
             this.currentGradedTestResult.setPassed(false);
         }
     }
-
 }

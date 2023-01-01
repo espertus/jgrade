@@ -1,11 +1,11 @@
 package com.github.tkutcher.jgrade.gradedtest;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.SelectClasses;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@Suite
+@SelectClasses({
         GradedTestListenerTest.class,
-        GradedTestResultTest.class,
-})
-public class AllGraderTests { }
+        GradedTestResultTest.class})
+public class AllGraderTests {
+}
