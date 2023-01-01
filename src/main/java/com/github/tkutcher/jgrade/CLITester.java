@@ -1,6 +1,6 @@
 package com.github.tkutcher.jgrade;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -78,18 +78,19 @@ public abstract class CLITester {
      * For example, if a user had main program <code>Hello</code>, they may
      * do the following to implement this method:
      * <code>
-     *     return Arrays.asList(new String[] {"java", "-cp", "lib/:.", "Hello"});
+     * return Arrays.asList(new String[] {"java", "-cp", "lib/:.", "Hello"});
      * </code>
+     *
      * @return The List of Strings that would invoke the program.
      */
     protected abstract List<String> getInvocation();
 
     /**
      * Initializes the command for the test (and is annotated with
-     * {@link Before}. Calls the abstract {@link #getInvocation()} and
+     * {@link BeforeEach}. Calls the abstract {@link #getInvocation()} and
      * initializes a new {@link ProcessBuilder}.
      */
-    @Before
+    @BeforeEach
     public void initCommand() {
         this.command = getInvocation();
         this.builder = new ProcessBuilder();
@@ -101,6 +102,7 @@ public abstract class CLITester {
      * command the arguments. For example, in a specific method the user
      * could do <code> getCommand().append("arg1"); </code> before calling
      * {@link #runCommand()}.
+     *
      * @return The current command (which is a List of Strings).
      */
     public List<String> getCommand() {
@@ -109,6 +111,7 @@ public abstract class CLITester {
 
     /**
      * Add a command line argument to the command to be run.
+     *
      * @param s The command line argument to be added
      */
     public void addCommandLineArg(String s) {
@@ -121,6 +124,7 @@ public abstract class CLITester {
      * If wanting to edit things about the builder for instance
      * {@link ProcessBuilder#redirectErrorStream()} use this method to access
      * the builder.
+     *
      * @return The {@link ProcessBuilder} being used.
      */
     public ProcessBuilder getBuilder() {
@@ -131,6 +135,7 @@ public abstract class CLITester {
      * Set whether or not to print the captured output. If true, then when
      * {@link #runCommand()} is called it will automatically print the output
      * to System.out.
+     *
      * @param to The boolean value to set whether or not to print output.
      */
     public void setPrintOutput(boolean to) {
@@ -139,6 +144,7 @@ public abstract class CLITester {
 
     /**
      * Run a command with input. See {@link #runCommand()}.
+     *
      * @param withInput The input to input to the execution.
      * @return The result of the execution of the program.
      */
@@ -155,6 +161,7 @@ public abstract class CLITester {
      * Run the command as it is currently set for this class without feeding
      * in anything to stdin. If the program takes command line input, see
      * {@link #runCommand(String)}.
+     *
      * @return The result of the execution of the program.
      */
     protected CLIResult runCommand() {
@@ -165,7 +172,8 @@ public abstract class CLITester {
      * Execute a process provided a {@link ProcessBuilder} that has a command
      * set to invoke the process, and a String for input to feed to the
      * program.
-     * @param builder The {@link ProcessBuilder} to use for the command.
+     *
+     * @param builder   The {@link ProcessBuilder} to use for the command.
      * @param toWriteIn Input for the program that it reads from stdin.
      * @return The {@link CLIResult} containing the output from the run.
      */
@@ -200,6 +208,7 @@ public abstract class CLITester {
      * Executes a process with a provided {@link ProcessBuilder} but sends
      * no input to the program. Other than that, same as
      * {@link #executeProcess(ProcessBuilder, String)}.
+     *
      * @param builder The {@link ProcessBuilder} to use to run.
      * @return The {@link CLIResult} containing the output from the run.
      */

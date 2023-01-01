@@ -1,20 +1,19 @@
 package com.github.tkutcher.jgrade;
 
 import com.github.tkutcher.jgrade.gradedtest.GradedTestResult;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GraderTest {
 
     private Grader unit;
 
-    @Before
+    @BeforeEach
     public void initUnit() {
         unit = new Grader();
     }
@@ -66,7 +65,7 @@ public class GraderTest {
     public void canTimeOnce() {
         unit.startTimer();
         long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < 400);
+        while (System.currentTimeMillis() - startTime < 400) ;
         unit.stopTimer();
 
         assertTrue(unit.hasExecutionTime());
@@ -78,22 +77,23 @@ public class GraderTest {
     public void canContinueTimer() {
         unit.startTimer();
         long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < 400);
+        while (System.currentTimeMillis() - startTime < 400) ;
         unit.stopTimer();
 
         long atPause = unit.getExecutionTime();
 
         unit.startTimer();
         startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < 300);
+        while (System.currentTimeMillis() - startTime < 300) ;
         unit.stopTimer();
 
         assertTrue(unit.getExecutionTime() > atPause);
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void cannotStopTimerIfNotStarted() {
-        unit.stopTimer();
+        assertThrows(IllegalStateException.class, () ->
+                unit.stopTimer()
+        );
     }
-
 }

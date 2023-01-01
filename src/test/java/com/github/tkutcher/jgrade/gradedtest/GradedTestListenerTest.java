@@ -1,13 +1,17 @@
 package com.github.tkutcher.jgrade.gradedtest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
 
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.LauncherSession;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 
 public class GradedTestListenerTest {
@@ -20,15 +24,20 @@ public class GradedTestListenerTest {
 
     private GradedTestListener listener;
 
-    @Before
+    @BeforeEach
     public void initUnit() {
-        this.listener = new GradedTestListener();
+        this.listener = new GradedTestListener(this.getClass());
     }
 
     private void runWithListenerForExample(Class exampleUnitTests) {
-        JUnitCore runner = new JUnitCore();
-        runner.addListener(this.listener);
-        runner.run(exampleUnitTests);
+        LauncherDiscoveryRequest request =
+                LauncherDiscoveryRequestBuilder.request()
+                        .selectors(selectClass(exampleUnitTests)).build();
+        try (LauncherSession session = LauncherFactory.openSession()) {
+            Launcher launcher = session.getLauncher();
+            launcher.registerTestExecutionListeners(this.listener);
+            launcher.execute(request);
+        }
     }
 
     private GradedTestResult getOnlyGradedTestResult(Class exampleUnitTests) {
@@ -70,7 +79,7 @@ public class GradedTestListenerTest {
         assertEquals(EXAMPLE_NAME, result.getName());
         assertEquals(EXAMPLE_NUMBER, result.getNumber());
         assertEquals(EXAMPLE_POINTS, result.getPoints(), 0.0);
-        Assert.assertEquals(GradedTestResult.HIDDEN, result.getVisibility());
+        assertEquals(GradedTestResult.HIDDEN, result.getVisibility());
     }
 
     @Test
