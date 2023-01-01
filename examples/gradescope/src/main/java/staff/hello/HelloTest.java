@@ -4,30 +4,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import com.github.tkutcher.jgrade.gradedtest.GradedTest;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
 import student.hello.Greeting;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Timeout(value = 10) // fail any test if not done in 10 seconds
 public class HelloTest {
 
     // I use this so I can run locally and verify output
     static final boolean DEBUG = false;
 
-    // I like to add this no matter what so if the submission loops,
-    // Gradescope doesn't get stuck.
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(10);
-
-
     private static final String GREETING = "Hello";
     private Greeting unit;
 
     // Running with the DEBUG flag enabled tests the staff solution.
-    @Before
+    @BeforeEach
     public void initUnit() {
         this.unit = DEBUG ? new Hello(GREETING) : new student.hello.Hello(GREETING);
     }
