@@ -54,7 +54,7 @@ public class GraderTest {
 
     @Test
     public void canAddGradedTestResults() {
-        GradedTestResult t = new GradedTestResult("", "", 0.0, Visibility.VISIBLE);
+        GradedTestResult t = new GradedTestResult("", "", 0.0, Visibility.VISIBLE, true);
         unit.addGradedTestResult(t);
         assertTrue(unit.hasGradedTestResults());
         List<GradedTestResult> results = unit.getGradedTestResults();

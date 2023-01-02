@@ -56,7 +56,7 @@ public class DeductiveGraderStrategy implements GraderStrategy {
         }
         // Since scores get set to 0 ...
         GradedTestResult baseScore = new GradedTestResult(sectionName, "",
-                startingScore, Visibility.HIDDEN);
+                startingScore, Visibility.HIDDEN, true);
         baseScore.setScore(startingScore);
         l.add(baseScore);
     }

@@ -167,7 +167,7 @@ public class CheckstyleGrader {
     }
 
     private GradedTestResult initResult() {
-        return new GradedTestResult(CHECKSTYLE_NAME, "", this.points, VISIBLE);
+        return new GradedTestResult(CHECKSTYLE_NAME, "", this.points, VISIBLE, true);
     }
 
     private GradedTestResult internalErrorResult(String msg) {

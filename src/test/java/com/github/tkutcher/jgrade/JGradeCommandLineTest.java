@@ -97,7 +97,12 @@ public class JGradeCommandLineTest {
                 "Test GradedTestResult",
                 "1",
                 25.0,
+<<<<<<< HEAD
                 Visibility.VISIBLE
+=======
+                GradedTestResult.VISIBLE,
+                true
+>>>>>>> e3d4f77... Add annotation field to suppress output
         ));
     }
 }

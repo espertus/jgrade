@@ -45,4 +45,11 @@ public @interface GradedTest {
      * @return The visibility level of the test.
      */
     Visibility visibility() default Visibility.VISIBLE;
+
+    /**
+     * Whether to include standard output in the test result.
+     *
+     * @return whether to include standard output in the test result
+     */
+    boolean includeOutput() default true;
 }

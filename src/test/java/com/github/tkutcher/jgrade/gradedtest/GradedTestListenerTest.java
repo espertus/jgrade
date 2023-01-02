@@ -2,6 +2,7 @@ package com.github.tkutcher.jgrade.gradedtest;
 
 
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.Launcher;
@@ -21,6 +22,7 @@ public class GradedTestListenerTest {
     private static final String EXAMPLE_NAME = "Graded Test";
     private static final String EXAMPLE_NUMBER = "Example Number";
     private static final double EXAMPLE_POINTS = 2.0;
+    private static final boolean EXAMPLE_INCLUDE_OUTPUT = false;
 
     private GradedTestListener listener;
 
@@ -71,6 +73,7 @@ public class GradedTestListenerTest {
         assertEquals(GradedTestResult.DEFAULT_NUMBER, result.getNumber());
         assertEquals(GradedTestResult.DEFAULT_POINTS, result.getPoints(), 0.0);
         assertEquals(GradedTestResult.DEFAULT_VISIBILITY, result.getVisibility());
+        assertEquals(GradedTestResult.DEFAULT_INCLUDE_OUTPUT, result.getIncludeOutput());
     }
 
     @Test
@@ -80,6 +83,7 @@ public class GradedTestListenerTest {
         assertEquals(EXAMPLE_NUMBER, result.getNumber());
         assertEquals(EXAMPLE_POINTS, result.getPoints(), 0.0);
         assertEquals(Visibility.HIDDEN, result.getVisibility());
+        assertEquals(EXAMPLE_INCLUDE_OUTPUT, result.getIncludeOutput());
     }
 
     @Test
@@ -129,26 +133,37 @@ public class GradedTestListenerTest {
 
     public static class BasicGradedTests {
         @Test
-        @GradedTest(name=EXAMPLE_NAME, points=2.0)
-        public void trueIsTrue() { assertTrue(true); }
+        @GradedTest(name = EXAMPLE_NAME, points = 2.0)
+        public void trueIsTrue() {
+            assertTrue(true);
+        }
 
         @Test
-        @GradedTest(name=EXAMPLE_NAME, points=2.0)
-        public void falseIsFalse() { assertFalse(false); }
+        @GradedTest(name = EXAMPLE_NAME, points = 2.0)
+        public void falseIsFalse() {
+            assertFalse(false);
+        }
     }
 
     public static class NotAllTestsGraded {
         @Test
-        @GradedTest(name=EXAMPLE_NAME, points=2.0)
-        public void trueIsTrue() { assertTrue(true); }
+        @GradedTest(name = EXAMPLE_NAME, points = 2.0)
+        public void trueIsTrue() {
+            assertTrue(true);
+        }
 
         @Test
-        public void falseIsFalse() { assertFalse(false); }
+        public void falseIsFalse() {
+            assertFalse(false);
+        }
     }
 
     public static class SingleDefaultGradedTest {
         @Test
-        @GradedTest public void gradedTest() { assertTrue(true); }
+        @GradedTest
+        public void gradedTest() {
+            assertTrue(true);
+        }
     }
 
     public static class SingleCustomGradedTest {
@@ -157,29 +172,47 @@ public class GradedTestListenerTest {
                 name=EXAMPLE_NAME,
                 number=EXAMPLE_NUMBER,
                 points=EXAMPLE_POINTS,
-                visibility=Visibility.HIDDEN)
-        public void gradedTest() { assertTrue(true); }
+                visibility=Visibility.HIDDEN,
+                includeOutput = EXAMPLE_INCLUDE_OUTPUT)
+        public void gradedTest() {
+            assertTrue(true);
+        }
     }
 
     public static class SingleFailedGradedTest {
         @Test
-        @GradedTest public void gradedTest() { fail(); }
+        @GradedTest
+        public void gradedTest() {
+            fail();
+        }
     }
 
     public static class SingleFailWithMessageGradedTest {
         @Test
-        @GradedTest public void gradedTest() { fail(EXAMPLE_MESSAGE); }
+        @GradedTest
+        public void gradedTest() {
+            fail(EXAMPLE_MESSAGE);
+        }
     }
 
     public static class MultipleFailOneGradedTest {
         @Test
-        public void nonGradedTest() { fail(); }
+        public void nonGradedTest() {
+            fail();
+        }
+
         @Test
-        @GradedTest public void gradedTest() { fail(); }
+        @GradedTest
+        public void gradedTest() {
+            fail();
+        }
     }
 
     public static class TestWithOutput {
         @Test
-        @GradedTest public void gradedTest() { System.out.print(EXAMPLE_STRING); }
+        @GradedTest
+        public void gradedTest() {
+            System.out.print(EXAMPLE_STRING);
+        }
     }
 }
