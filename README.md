@@ -75,6 +75,12 @@ public class ExampleGradedTests {
     }
 
     @Test
+    @GradedTest(name = "Does not capture output", includeOutput = false)
+    public void capturesOutput() {
+        System.out.println("goodbye");
+    }
+
+    @Test
     @GradedTest(name = "This test should fail")
     public void badTest() {
         fail();

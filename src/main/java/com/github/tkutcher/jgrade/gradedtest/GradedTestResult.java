@@ -30,11 +30,13 @@ public class GradedTestResult {
     static final String DEFAULT_NUMBER = "";
     static final double DEFAULT_POINTS = 1.0;
     static final String DEFAULT_VISIBILITY = VISIBLE;
+    static final boolean DEFAULT_INCLUDE_OUTPUT = true;
 
     private String name;
     private String number;
     private double points;
     private String visibility;
+    private boolean includeOutput;
 
     private double score;
     private StringBuilder output;
@@ -46,9 +48,10 @@ public class GradedTestResult {
      * @param number The identifier for the question number.
      * @param points The number of points the test is worth.
      * @param visibility The visibility setting of the test.
+     * @param includeOutput Whether to include the output of the test.
      * @throws IllegalArgumentException If the visibility is not valid.
      */
-    public GradedTestResult(String name, String number, double points, String visibility)
+    public GradedTestResult(String name, String number, double points, String visibility, boolean includeOutput)
             throws IllegalArgumentException {
         this.name = name;
         this.number = number;
@@ -62,6 +65,7 @@ public class GradedTestResult {
 
         this.visibility = visibility;
         this.score = 0;
+        this.includeOutput = includeOutput;
         this.output = new StringBuilder();
         this.passed = true;
     }
@@ -69,11 +73,13 @@ public class GradedTestResult {
     // <editor-fold "desc="accessors">
 
     /**
-     * Add output to the test result.
+     * Add output to the test result if {@link #includeOutput} is true.
      * @param s String to append to the output.
      */
     public void addOutput(String s) {
-        this.output.append(s);
+        if (this.includeOutput) {
+            this.output.append(s);
+        }
     }
 
     /**
@@ -152,6 +158,13 @@ public class GradedTestResult {
         return this.output.toString();
     }
 
+    public void setIncludeOutput(boolean value) {
+        this.includeOutput = value;
+    }
+
+    public boolean getIncludeOutput() {
+        return this.includeOutput;
+    }
 
     /**
      * Determine if the test for this result was considered to have passed

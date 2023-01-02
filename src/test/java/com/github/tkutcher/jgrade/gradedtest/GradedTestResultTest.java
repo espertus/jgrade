@@ -15,7 +15,8 @@ public class GradedTestResultTest {
                 GradedTestResult.DEFAULT_NAME,
                 GradedTestResult.DEFAULT_NUMBER,
                 GradedTestResult.DEFAULT_POINTS,
-                GradedTestResult.DEFAULT_VISIBILITY
+                GradedTestResult.DEFAULT_VISIBILITY,
+                GradedTestResult.DEFAULT_INCLUDE_OUTPUT
         );
     }
 
@@ -25,6 +26,7 @@ public class GradedTestResultTest {
         assertEquals(GradedTestResult.DEFAULT_NUMBER, unit.getNumber());
         assertEquals(GradedTestResult.DEFAULT_POINTS, unit.getPoints(), 0.0);
         assertEquals(GradedTestResult.DEFAULT_VISIBILITY, unit.getVisibility());
+        assertEquals(GradedTestResult.DEFAULT_INCLUDE_OUTPUT, unit.getIncludeOutput());
     }
 
     @Test
@@ -48,6 +50,13 @@ public class GradedTestResultTest {
         assertEquals(s1 + s2, unit.getOutput());
     }
 
+    public void canSuppressOutput() {
+        unit.setIncludeOutput(false);
+        assertEquals("", unit.getOutput());
+        unit.addOutput("Hello world");
+        assertEquals("", unit.getOutput());
+    }
+
     @Test
     public void canAddScore() {
         double score1 = 0.5;
@@ -69,7 +78,7 @@ public class GradedTestResultTest {
     @Test
     public void visibilityMustBeValid() {
         assertThrows(IllegalArgumentException.class, () ->
-                new GradedTestResult(GradedTestResult.DEFAULT_NAME, GradedTestResult.DEFAULT_NUMBER, GradedTestResult.DEFAULT_POINTS, "INVALID")
+                new GradedTestResult(GradedTestResult.DEFAULT_NAME, GradedTestResult.DEFAULT_NUMBER, GradedTestResult.DEFAULT_POINTS, "INVALID", GradedTestResult.DEFAULT_INCLUDE_OUTPUT)
         );
     }
 }

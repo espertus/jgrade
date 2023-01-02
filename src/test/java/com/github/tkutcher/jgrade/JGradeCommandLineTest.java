@@ -96,7 +96,8 @@ public class JGradeCommandLineTest {
                 "Test GradedTestResult",
                 "1",
                 25.0,
-                GradedTestResult.VISIBLE
+                GradedTestResult.VISIBLE,
+                true
         ));
     }
 }

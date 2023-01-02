@@ -8,10 +8,8 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * FIXME A class that extends a JUnit RunListener to check for unit test
@@ -109,7 +107,8 @@ public class GradedTestListener extends SummaryGeneratingListener {
                             gradedTestAnnotation.name(),
                             gradedTestAnnotation.number(),
                             gradedTestAnnotation.points(),
-                            gradedTestAnnotation.visibility()
+                            gradedTestAnnotation.visibility(),
+                            gradedTestAnnotation.includeOutput()
                     );
 
                     this.currentGradedTestResult.setScore(gradedTestAnnotation.points());
@@ -135,7 +134,9 @@ public class GradedTestListener extends SummaryGeneratingListener {
             handleFailure(result);
         }
         if (this.currentGradedTestResult != null) {
-            this.currentGradedTestResult.addOutput(testOutput.toString());
+            if (this.currentGradedTestResult.getIncludeOutput()) {
+                this.currentGradedTestResult.addOutput(testOutput.toString());
+            }
             this.gradedTestResults.add(this.currentGradedTestResult);
         }
         this.currentGradedTestResult = null;

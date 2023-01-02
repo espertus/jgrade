@@ -53,7 +53,7 @@ public class GraderTest {
 
     @Test
     public void canAddGradedTestResults() {
-        GradedTestResult t = new GradedTestResult("", "", 0.0, "visible");
+        GradedTestResult t = new GradedTestResult("", "", 0.0, "visible", true);
         unit.addGradedTestResult(t);
         assertTrue(unit.hasGradedTestResults());
         List<GradedTestResult> results = unit.getGradedTestResults();
