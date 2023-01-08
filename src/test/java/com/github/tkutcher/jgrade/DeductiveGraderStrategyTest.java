@@ -23,13 +23,13 @@ public class DeductiveGraderStrategyTest {
     }
 
     private static GradedTestResult failedGradedTestResult(double points) {
-        GradedTestResult r = new GradedTestResult("", "", points, Visibility.HIDDEN);
+        GradedTestResult r = new GradedTestResult("", "", points, Visibility.HIDDEN, true);
         r.setPassed(false);
         return r;
     }
 
     private static GradedTestResult successfulGradedTestResult(double points) {
-        GradedTestResult r = new GradedTestResult("", "", points, Visibility.HIDDEN);
+        GradedTestResult r = new GradedTestResult("", "", points, Visibility.HIDDEN, true);
         r.setPassed(true);
         r.setScore(points);
         return r;

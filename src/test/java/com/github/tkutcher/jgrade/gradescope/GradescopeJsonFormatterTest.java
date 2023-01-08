@@ -48,7 +48,7 @@ public class GradescopeJsonFormatterTest {
 
     @Test
     public void validIfTests() throws JSONException {
-        grader.addGradedTestResult(new GradedTestResult("", "", 20.0, Visibility.VISIBLE));
+        grader.addGradedTestResult(new GradedTestResult("", "", 20.0, Visibility.VISIBLE, true));
         assertValidJson(unit.format(grader));
     }
 }

@@ -13,7 +13,7 @@ public class GradeHello {
         if (HelloTest.DEBUG) {
             GradedTestResult r = new GradedTestResult(
                     "Debug Mode Warning", "",
-                    0.0, Visibility.HIDDEN
+                    0.0, Visibility.HIDDEN, true
             );
             r.addOutput("WARNING: Autograder in DEBUG mode, not " +
                     "checking student submission. If seeing this on " +
