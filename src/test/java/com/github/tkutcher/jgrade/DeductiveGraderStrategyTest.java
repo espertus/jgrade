@@ -2,6 +2,7 @@ package com.github.tkutcher.jgrade;
 
 import com.github.tkutcher.jgrade.gradedtest.GradedTestResult;
 import com.github.tkutcher.jgrade.gradedtest.Visibility;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
