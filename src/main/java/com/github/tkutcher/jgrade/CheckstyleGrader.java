@@ -1,6 +1,7 @@
 package com.github.tkutcher.jgrade;
 
 import com.github.tkutcher.jgrade.gradedtest.GradedTestResult;
+import com.github.tkutcher.jgrade.gradedtest.Visibility;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -54,11 +55,12 @@ public class CheckstyleGrader {
     private String pathToJar;
     private String dirToCheck;
     private String config;
+    private Visibility visibility;
 
     private Map<String, Integer> errorTypes;
 
     /**
-     * Instantiate a new CheckstyleGrader.
+     * Instantiate a new CheckstyleGrader with visible results.
      *
      * @param points     The total number of points for the checkstyle test.
      * @param deduct     The number of points to deduct per error.
@@ -67,12 +69,27 @@ public class CheckstyleGrader {
      */
     public CheckstyleGrader(double points, double deduct,
                             String pathToJar, String dirToCheck) {
+        this(points, deduct, pathToJar, dirToCheck, Visibility.VISIBLE);
+    }
+
+    /**
+     * Instantiate a new CheckstyleGrader.
+     *
+     * @param points     The total number of points for the checkstyle test.
+     * @param deduct     The number of points to deduct per error.
+     * @param pathToJar  The path to the checkstyle jar executable.
+     * @param dirToCheck The directory of files to check.
+     * @param visibility The visibility level
+     */
+    public CheckstyleGrader(double points, double deduct,
+                            String pathToJar, String dirToCheck, Visibility visibility) {
         this.points = points;
         this.deduct = deduct;
         this.pathToJar = pathToJar;
         this.dirToCheck = dirToCheck;
         this.config = null;
         this.errorTypes = new TreeMap<>();
+        this.visibility = visibility;
     }
 
     /**
@@ -167,7 +184,7 @@ public class CheckstyleGrader {
     }
 
     private GradedTestResult initResult() {
-        return new GradedTestResult(CHECKSTYLE_NAME, "", this.points, VISIBLE, true);
+        return new GradedTestResult(CHECKSTYLE_NAME, "", this.points, this.visibility, true);
     }
 
     private GradedTestResult internalErrorResult(String msg) {
